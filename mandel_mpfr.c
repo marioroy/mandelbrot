@@ -3,7 +3,6 @@
 #include <stdlib.h>
 #include <stdbool.h>
 #include <math.h>
-#include <gmp.h>
 #include <mpfr.h>
 
 int main(int argc, char **argv) {
@@ -85,8 +84,8 @@ int main(int argc, char **argv) {
             hx = 0;
             hy = 0;
             double zxd, zyd;
-            for (i = 1; i <= maxiter; i++) {
             //for (i = 1; i <= 50000; i++) {
+            for (i = 1; i <= maxiter; i++) {
                 //xx = zx * zx;
                 mpfr_mul(xx, zx, zx, MPFR_RNDN);
                 //yy = zy * zy;

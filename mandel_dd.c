@@ -3,7 +3,6 @@
 #include <stdlib.h>
 #include <stdbool.h>
 #include <math.h>
-#include <gmp.h>
 #include "doubledouble.h"
 
 int main(int argc, char **argv) {
@@ -20,14 +19,16 @@ int main(int argc, char **argv) {
     char* image = malloc(width*height*3);
     unsigned int x, y;
     DoubleDouble centerx, centery;
-    centerx = dd_new(-0.7436438870371587, -3.628952515063387E-17);
-    centery = dd_new(0.13182590420531198, -1.2892807754956678E-17);
+    // centerx = dd_new(-0.7436438870371587, -3.628952515063387E-17);
+    // centery = dd_new(0.13182590420531198, -1.2892807754956678E-17);
+    centerx = dd_new(strtod(argv[3], NULL), 0);
+    centery = dd_new(strtod(argv[4], NULL), 0);
     double bailout = 128; // with a smaller value there are lines on magn=1
     double logLogBailout = log(log(bailout));
     DoubleDouble magn = dd_new(strtod(argv[5], NULL), 0);
-    /*// maxiter = width * sqrt(magn);
+    // maxiter = width * sqrt(magn);
     temp1 = dd_sqrt(magn);
-    unsigned long maxiter = width * dd_get_ui(temp1);*/
+    unsigned long maxiter = width * dd_get_ui(temp1);
     DoubleDouble x2, y2, x0d, y1d;
     // x0d = 4 / magn / width;
     x0d = dd_ui_div(4, magn);
@@ -74,8 +75,8 @@ int main(int argc, char **argv) {
             int whenupdate = 10;
             hx = 0;
             hy = 0;
-            //for (i = 1; i <= maxiter; i++) {
-            for (i = 1; i <= 50000; i++) {
+            //for (i = 1; i <= 50000; i++) {
+            for (i = 1; i <= maxiter; i++) {
                 //xx = zx * zx;
                 xx = dd_sqr(zx);
                 //yy = zy * zy;

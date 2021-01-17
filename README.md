@@ -34,11 +34,18 @@ mandel_dd_aa:
  - with antialiasing
  - it is more than three times faster than the Zom-B version (see below)
 
+mandel_dd_aa_omp:
+ - with parallel processing using OpenMP
+ - build binary explicity via `make mandel_dd_aa_omp`
 
 How to compile
 ==============
 
-Compile by running `make`.
+Compile by running `make`. On macOS, compile using gcc-10 from brew.
+
+	$ brew install gcc mpfr
+	$ CC="gcc-10 -I/usr/local/include -L/usr/local/lib" make
+	$ CC="gcc-10 make mandel_dd_aa_omp
 
 How to execute
 ==============
@@ -46,7 +53,7 @@ How to execute
 Each of the tools takes as arguments the width, height, coordinates and
 magnification. Output is in PPM format on standard output.
 
-	$ ./mandel_dd_aa 1920 1080 0.0 0.0 1.0 > out.ppm
+	$ ./mandel_dd_aa 1920 1080 -0.75 0.0 1.0 > out.ppm
 
 You can compress the ppm by using:
 

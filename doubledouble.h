@@ -5,7 +5,7 @@ typedef struct {
     double lo;
 } DoubleDouble;
 
-inline DoubleDouble dd_new(double hi, double lo) {
+extern inline DoubleDouble dd_new(double hi, double lo) {
     DoubleDouble num;
     num.hi = hi;
     num.lo = lo;
@@ -16,7 +16,7 @@ unsigned int dd_get_ui(DoubleDouble num) {
     return num.hi;
 }
 
-inline DoubleDouble dd_sqrt(DoubleDouble num) {
+extern inline DoubleDouble dd_sqrt(DoubleDouble num) {
     double a, b, c, d, e;
     d = 1 / sqrt(num.hi);
     e = num.hi * d;
@@ -33,7 +33,7 @@ inline DoubleDouble dd_sqrt(DoubleDouble num) {
     return dd_new(a, (e - (b + a)) + (b + c));
 }
 
-inline DoubleDouble dd_div(DoubleDouble num1, DoubleDouble num2) {
+extern inline DoubleDouble dd_div(DoubleDouble num1, DoubleDouble num2) {
     double a, b, c, d, e, f, g;
     f = num1.hi / num2.hi;
     a = 0x08000001 * num2.hi;
@@ -57,23 +57,23 @@ inline DoubleDouble dd_div(DoubleDouble num1, DoubleDouble num2) {
     return dd_new(a, b + (f - a));
 }
 
-inline DoubleDouble dd_ui_div(unsigned int num1, DoubleDouble num2) {
+extern inline DoubleDouble dd_ui_div(unsigned int num1, DoubleDouble num2) {
     return dd_div(dd_new(num1, 0), num2);
 }
 
-inline DoubleDouble dd_div_ui(DoubleDouble num1, unsigned int num2) {
+extern inline DoubleDouble dd_div_ui(DoubleDouble num1, unsigned int num2) {
     return dd_div(num1, dd_new(num2, 0));
 }
 
-inline DoubleDouble dd_si_div(signed int num1, DoubleDouble num2) {
+extern inline DoubleDouble dd_si_div(signed int num1, DoubleDouble num2) {
     return dd_div(dd_new(num1, 0), num2);
 }
 
-inline DoubleDouble dd_div_si(DoubleDouble num1, signed int num2) {
+extern inline DoubleDouble dd_div_si(DoubleDouble num1, signed int num2) {
     return dd_div(num1, dd_new(num2, 0));
 }
 
-inline DoubleDouble dd_add(DoubleDouble num1, DoubleDouble num2) {
+extern inline DoubleDouble dd_add(DoubleDouble num1, DoubleDouble num2) {
     double a, b, c, d, e, f;
     e = num1.hi + num2.hi;
     d = num1.hi - e;
@@ -86,7 +86,7 @@ inline DoubleDouble dd_add(DoubleDouble num1, DoubleDouble num2) {
     return dd_new(a, c + (b - a));
 }
 
-inline DoubleDouble dd_mul(DoubleDouble num1, DoubleDouble num2) {
+extern inline DoubleDouble dd_mul(DoubleDouble num1, DoubleDouble num2) {
     double a, b, c, d, e;
     a = 0x08000001 * num1.hi;
     a += num1.hi - a;
@@ -100,7 +100,7 @@ inline DoubleDouble dd_mul(DoubleDouble num1, DoubleDouble num2) {
     return dd_new(a, c + (e - a));
 }
 
-inline DoubleDouble dd_mul2(DoubleDouble num1, DoubleDouble num2) {
+extern inline DoubleDouble dd_mul2(DoubleDouble num1, DoubleDouble num2) {
     double a, b, c, d, e;
     a = 0x08000001 * num1.hi;
     a += num1.hi - a;
@@ -114,15 +114,15 @@ inline DoubleDouble dd_mul2(DoubleDouble num1, DoubleDouble num2) {
     return dd_new(a, c + (2*e - a));
 }
 
-inline DoubleDouble dd_mul_ui(DoubleDouble num1, unsigned int num2) {
+extern inline DoubleDouble dd_mul_ui(DoubleDouble num1, unsigned int num2) {
     return dd_mul(num1, dd_new(num2, 0));
 }
 
-inline DoubleDouble dd_mul_d(DoubleDouble num1, double num2) {
+extern inline DoubleDouble dd_mul_d(DoubleDouble num1, double num2) {
     return dd_mul(num1, dd_new(num2, 0));
 }
 
-inline DoubleDouble dd_sub(DoubleDouble num1, DoubleDouble num2) {
+extern inline DoubleDouble dd_sub(DoubleDouble num1, DoubleDouble num2) {
     double a, b, c, d, e, f, g;
     g = num1.lo - num2.lo;
     f = num1.lo - g;
@@ -135,7 +135,7 @@ inline DoubleDouble dd_sub(DoubleDouble num1, DoubleDouble num2) {
     return dd_new(a, c + (b - a));
 }
 
-inline DoubleDouble dd_sqr(DoubleDouble num) {
+extern inline DoubleDouble dd_sqr(DoubleDouble num) {
     double a, b, c;
     a = 0x08000001 * num.hi;
     a += num.hi - a;

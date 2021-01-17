@@ -1,9 +1,24 @@
+//
+// non-parallel
+//   gcc -O3 -Wall -Wno-unknown-pragmas -lm mandel_dd_aa.c -o mandel_dd_aa
+// parallel via OpenMP
+//   gcc -O3 -Wall -fopenmp -lm mandel_dd_aa.c -o mandel_dd_aa_omp
+//
+// by default, OpenMP consumes all logical cores
+//   time ./mandel_dd_aa_omp 1920 1080 -0.75 0.0 1.0 > out.ppm
+//   time OMP_NUM_THREADS=4 ./mandel_dd_aa_omp 1920 1080 -0.75 0.0 1.0 > out.ppm
+//
+#if defined(_OPENMP)
+    #include <omp.h>
+#else
+    inline int omp_get_thread_num() { return 0; }
+#endif
+
 #include "colors.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <stdbool.h>
 #include <math.h>
-#include <gmp.h>
 #include "doubledouble.h"
 
 DoubleDouble x2, y2, x0d, y1d;
@@ -12,6 +27,7 @@ double LOG2 = 0.69314718055994530941723212145817656807550013436026;
 double bailout = 128; // with a smaller value there are lines on magn=1
 double eps = 1e-17;
 double logLogBailout;
+unsigned long maxiter;
 
 inline int getcoloridx(unsigned long lastit, double zxd, double zyd) {
     double r, c;
@@ -38,8 +54,8 @@ inline void calculate_pixel(double x, double y, unsigned long *lastit, double *z
     double hx, hy, d;
     hx = 0;
     hy = 0;
-    //for (i = 1; i <= maxiter; i++) {
-    for (i = 1; i <= 50000; i++) {
+    //for (i = 1; i <= 50000; i++) {
+    for (i = 1; i <= maxiter; i++) {
         //xx = zx * zx;
         xx = dd_sqr(zx);
         //yy = zy * zy;
@@ -93,15 +109,16 @@ int main(int argc, char **argv) {
     unsigned int height = atoi(argv[2]);
     unsigned char* tmpimage = malloc(width*height*3);
     unsigned char* finalimage = malloc(width*height*3);
-    unsigned int x, y;
     DoubleDouble centerx, centery;
-    centerx = dd_new(-0.7436438870371587, -3.628952515063387E-17);
-    centery = dd_new(0.13182590420531198, -1.2892807754956678E-17);
+    // centerx = dd_new(-0.7436438870371587, -3.628952515063387E-17);
+    // centery = dd_new(0.13182590420531198, -1.2892807754956678E-17);
+    centerx = dd_new(strtod(argv[3], NULL), 0);
+    centery = dd_new(strtod(argv[4], NULL), 0);
     logLogBailout = log(log(bailout));
     DoubleDouble magn = dd_new(strtod(argv[5], NULL), 0);
-    /*// maxiter = width * sqrt(magn);
+    // maxiter = width * sqrt(magn);
     temp1 = dd_sqrt(magn);
-    unsigned long maxiter = width * dd_get_ui(temp1);*/
+    maxiter = width * dd_get_ui(temp1);
     // x0d = 4 / magn / width;
     x0d = dd_ui_div(4, magn);
     x0d = dd_div_ui(x0d, width);
@@ -117,14 +134,20 @@ int main(int argc, char **argv) {
     temp1 = dd_div_ui(temp1, width);
     y2 = dd_mul(y2, temp1);
     y2 = dd_add(y2, centery);
-    unsigned int idx;
-    unsigned int imgidx = 0;
-    unsigned long lastit;
-    double zxd, zyd;
-    bool inside;
-    for (y = 0; y < height; y++) {
-        for (x = 0; x < width; x++) {
+
+    #pragma omp parallel for schedule(static, 1)
+    for (unsigned int y = 0; y < height; y++) {
+        unsigned int idx;
+        unsigned int imgidx = y*width*3;
+        unsigned long lastit;
+        double zxd, zyd;
+        bool inside;
+
+        // have one worker output progress
+        if (omp_get_thread_num() == 0)
             fprintf(stderr, "\rR: %f %%", (float)imgidx/(width*height*3)*100);
+
+        for (unsigned int x = 0; x < width; x++) {
             calculate_pixel(x, y, &lastit, &zxd, &zyd, &inside);
 
             if (inside) {
@@ -140,18 +163,28 @@ int main(int argc, char **argv) {
         }
     }
 
-    imgidx = 0;
-    int finalidx = 0;
     int aafactor = 5;
     int aareach = aafactor / 2;
     int aaarea = aafactor * aafactor;
     double aafactorinv = 1.0/aafactor;
-    int xi, yi;
-    unsigned int val1, val2, val3;
-    double dx, dy;
-    for (y = 0; y < height; y++) {
-        for (x = 0; x < width; x++) {
+
+    #pragma omp parallel for schedule(static, 1)
+    for (unsigned int y = 0; y < height; y++) {
+        unsigned int idx;
+        unsigned int imgidx = y*width*3;
+        unsigned int finalidx = imgidx;
+        unsigned long lastit;
+        double zxd, zyd;
+        bool inside;
+        int xi, yi;
+        unsigned int val1, val2, val3;
+        double dx, dy;
+
+        // have one worker output progress
+        if (omp_get_thread_num() == 0)
             fprintf(stderr, "\rAA: %f %%", (float)imgidx/(width*height*3)*100);
+
+        for (unsigned int x = 0; x < width; x++) {
             val1 = tmpimage[imgidx++];
             val2 = tmpimage[imgidx++];
             val3 = tmpimage[imgidx++];
@@ -197,6 +230,7 @@ int main(int argc, char **argv) {
             finalimage[finalidx++] = val3/aaarea;
         }
     }
+
     // write out image
     printf("P6 %d %d 255\n", width, height);
     fwrite(finalimage, 1, width*height*3, stdout);
