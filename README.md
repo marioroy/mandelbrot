@@ -45,7 +45,7 @@ Compile by running `make`. On macOS, compile using gcc-10 from brew.
 
 	$ brew install gcc mpfr
 	$ CC="gcc-10 -I/usr/local/include -L/usr/local/lib" make
-	$ CC="gcc-10 make mandel_dd_aa_omp
+	$ CC="gcc-10" make mandel_dd_aa_omp
 
 How to execute
 ==============
