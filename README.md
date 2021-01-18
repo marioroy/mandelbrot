@@ -69,9 +69,18 @@ And even compress it further by doing:
 The shell script (with a small python helper) `run.sh` will generate and
 execute a list of commands to create a zooming sequence of images.
 
-You can create a video of the resulting sequence using:
+You can create a video of the resulting sequence using avconf or ffmpeg:
 
 	$ avconv -i out_%05d.png out.mp4
+	$ ffmpeg -r:v 5 -i out_%05d.png -codec:v libx264 -preset veryslow -pix_fmt yuv420p -crf 28 -an out.mp4
+
+	  -i         set the file pattern
+	  -r:v       set the frame rate per second
+	  -codec:v   set the video codec name
+	  -preset    set the encoding preset
+	  -pix_fmt   set the video pixel format
+	  -crf       select the quality for constant quality mode
+	  -an        disable audio
 
 Or a gif animation by using:
 
