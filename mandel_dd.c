@@ -75,8 +75,8 @@ int main(int argc, char **argv) {
             int whenupdate = 10;
             hx = 0;
             hy = 0;
-            //for (i = 1; i <= 50000; i++) {
-            for (i = 1; i <= maxiter; i++) {
+            //for (i = 1; i <= maxiter; i++) {
+            for (i = 1; i <= 50000; i++) {
                 //xx = zx * zx;
                 xx = dd_sqr(zx);
                 //yy = zy * zy;
